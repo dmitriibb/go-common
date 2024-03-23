@@ -16,7 +16,7 @@ var logger = logging.NewLogger("CommonUtils")
 var envFileName = os.Getenv(dotEnvFileNameEnv)
 
 func GetEnvProperty(propertyName string, defaultVals ...string) string {
-	fileNames := make([]string, 1)
+	fileNames := make([]string, 0)
 	if len(envFileName) > 0 {
 		fileNames = append(fileNames, envFileName)
 	}
