@@ -4,12 +4,23 @@ import (
 	"fmt"
 	"github.com/dmitriibb/go-common/logging"
 	"github.com/joho/godotenv"
+	"os"
+)
+
+const (
+	dotEnvFileNameEnv = "DOT_ENV_FILE_NAME"
 )
 
 var logger = logging.NewLogger("CommonUtils")
 
+var envFileName = os.Getenv(dotEnvFileNameEnv)
+
 func GetEnvProperty(propertyName string, defaultVals ...string) string {
-	envMap, err := godotenv.Read()
+	fileNames := make([]string, 1)
+	if len(envFileName) > 0 {
+		fileNames = append(fileNames, envFileName)
+	}
+	envMap, err := godotenv.Read(fileNames...)
 	if err != nil {
 		logger.Error("can't load .env file. %v", err.Error())
 		panic(fmt.Sprintf("can't load .env file. %v", err.Error()))
