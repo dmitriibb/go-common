@@ -3,6 +3,7 @@ package rabbit
 import (
 	"errors"
 	"fmt"
+	"github.com/dmitriibb/go-common/utils"
 	"gopkg.in/yaml.v2"
 	"os"
 )
@@ -10,6 +11,8 @@ import (
 const (
 	defaultFileNane string = "rabbitConfig.yaml"
 )
+
+var rabbitConfigFileNane = utils.GetEnvProperty(RabbitMqConfigFileEnv, defaultFileNane)
 
 var config RabbitConfig
 
@@ -53,15 +56,8 @@ func GetQueueConfig(name string) (RabbitQueueConfig, error) {
 	return conf.GetQueueConfig(name)
 }
 
-func GetRabbitConfig(fileNames ...string) (RabbitConfig, error) {
-	var fileName string
-	if len(fileNames) > 0 {
-		fileName = fileNames[0]
-	} else {
-		fileName = defaultFileNane
-	}
-
-	file, err := os.ReadFile(fileName)
+func GetRabbitConfig() (RabbitConfig, error) {
+	file, err := os.ReadFile(rabbitConfigFileNane)
 	if err != nil {
 		return config, err
 	}

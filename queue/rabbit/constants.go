@@ -1,5 +1,5 @@
 package rabbit
 
 const (
-	RabbitMqUriEnv = "RABBIT_MQ_URI"
+	RabbitMqConfigFileEnv = "RABBIT_MQ_CONFIG_FILE"
 )
