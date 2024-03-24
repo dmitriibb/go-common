@@ -27,6 +27,7 @@ var initializer = commonInitializer.New(logger)
 
 func Init() {
 	initFunc := func() error {
+		logger.Debug("db -> host %s, port %s, dbName %s", host, portString, dbname)
 		initDbTables()
 		return nil
 	}
