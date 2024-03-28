@@ -31,17 +31,13 @@ var initFunc = func() error {
 	password = utils.GetEnvProperty(DbPasswordEnv)
 	dbname = utils.GetEnvProperty(DbNameEnv)
 	dbInitMode = strings.ToLower(utils.GetEnvProperty(DbInitModeEnv, DbInitModeIgnore))
+
 	logger.Debug("db -> host %s, port %s, dbName %s", host, portString, dbname)
 	initDbTables()
 	return nil
 }
 
 func Init() {
-	initFunc := func() error {
-		logger.Debug("db -> host %s, port %s, dbName %s", host, portString, dbname)
-		initDbTables()
-		return nil
-	}
 	initializer.Init(initFunc)
 }
 
