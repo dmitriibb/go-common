@@ -6,7 +6,8 @@ import (
 )
 
 type Initializer interface {
-	Init(func() error) error
+	Init(f func() error) error
+	InitWithArgs(initFunc func(fArgs ...any) error, args ...interface{}) error
 }
 
 func New(logger logging.Logger) Initializer {
@@ -32,6 +33,24 @@ func (in *initializer) Init(initFunc func() error) error {
 	}
 	in.logger.Debug("initializing")
 	err := initFunc()
+	if err != nil {
+		in.logger.Error("not initialized because '%v'", err.Error())
+		return err
+	}
+	in.initialized = true
+	in.logger.Debug("initialized")
+	return nil
+}
+
+func (in *initializer) InitWithArgs(initFunc func(fArgs ...any) error, args ...interface{}) error {
+	in.mu.Lock()
+	defer in.mu.Unlock()
+	if in.initialized {
+		in.logger.Debug("already initialized")
+		return nil
+	}
+	in.logger.Debug("initializing")
+	err := initFunc(args...)
 	if err != nil {
 		in.logger.Error("not initialized because '%v'", err.Error())
 		return err

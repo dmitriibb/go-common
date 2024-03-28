@@ -13,17 +13,28 @@ import (
 	"strings"
 )
 
-var host = utils.GetEnvProperty(DbHostEnv)
-var portString = utils.GetEnvProperty(DbPortEnv)
-var user = utils.GetEnvProperty(DbUserEnv)
-var password = utils.GetEnvProperty(DbPasswordEnv)
-var dbname = utils.GetEnvProperty(DbNameEnv)
-var dbInitMode = strings.ToLower(utils.GetEnvProperty(DbInitModeEnv, DbInitModeIgnore))
+var host string
+var portString string
+var user string
+var password string
+var dbname string
+var dbInitMode string
 
 var logger = logging.NewLogger("PgConnections")
 var initializer = commonInitializer.New(logger)
 
 // TODO connection pool
+var initFunc = func() error {
+	host = utils.GetEnvProperty(DbHostEnv)
+	portString = utils.GetEnvProperty(DbPortEnv)
+	user = utils.GetEnvProperty(DbUserEnv)
+	password = utils.GetEnvProperty(DbPasswordEnv)
+	dbname = utils.GetEnvProperty(DbNameEnv)
+	dbInitMode = strings.ToLower(utils.GetEnvProperty(DbInitModeEnv, DbInitModeIgnore))
+	logger.Debug("db -> host %s, port %s, dbName %s", host, portString, dbname)
+	initDbTables()
+	return nil
+}
 
 func Init() {
 	initFunc := func() error {
@@ -127,11 +138,16 @@ func GetConnection() *sql.DB {
 	return connection
 }
 
-func StartTransaction(ctx context.Context) *TxWrapper {
+func StartTransaction(ctx context.Context) TxWrapperer {
 	logger.Debug("start transaction")
 	conn := GetConnection()
 	tx, _ := conn.BeginTx(ctx, nil)
 	return &TxWrapper{conn, tx}
+}
+
+type TxWrapperer interface {
+	Commit()
+	Rollback()
 }
 
 type TxWrapper struct {
@@ -145,6 +161,16 @@ func (txWrapper *TxWrapper) Commit() {
 		logger.Warn("commit transaction - %s", err.Error())
 	} else {
 		logger.Debug("commit transaction")
+	}
+	txWrapper.connection.Close()
+}
+
+func (txWrapper *TxWrapper) Rollback() {
+	err := txWrapper.Tx.Rollback()
+	if err != nil {
+		logger.Warn("rollback transaction - %s", err.Error())
+	} else {
+		logger.Debug("rollback transaction")
 	}
 	txWrapper.connection.Close()
 }
