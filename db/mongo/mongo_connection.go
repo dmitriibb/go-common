@@ -47,7 +47,7 @@ func TestConnection() {
 	logger.Debug("test connection to mongo")
 }
 
-// Deprecated: you must manually close the client
+// Deprecated: you must manually close the clientmodel
 func GetClient() *mongo.Client {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(mongoUri))
 	if err != nil {

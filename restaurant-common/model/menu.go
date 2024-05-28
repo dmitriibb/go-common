@@ -1,10 +1,10 @@
 package model
 
-type Menu struct {
-	Items []MenuItem
+type MenuDto struct {
+	Items []*MenuItemDto
 }
 
-type MenuItem struct {
+type MenuItemDto struct {
 	Name        string   `json:"name"`
 	Price       float32  `json:"price"`
 	Description string   `json:"description"`
