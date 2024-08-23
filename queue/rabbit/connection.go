@@ -52,7 +52,7 @@ func TestConnection() {
 			Body:        []byte(body),
 		})
 	failOnError(err, "Failed to publish a message")
-	logger.Info(" [x] Sent %s\n", body)
+	logger.Info(" [x] Sent %v\n", body)
 
 }
 

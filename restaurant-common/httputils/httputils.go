@@ -18,3 +18,9 @@ func ReturnResponseWithError(w http.ResponseWriter, statusCode int, logger loggi
 		Message: message,
 	})
 }
+
+func GetCommonErrorResponse(resp *http.Response) model.CommonErrorResponse {
+	commonResponse := model.CommonErrorResponse{}
+	json.NewDecoder(resp.Body).Decode(&commonResponse)
+	return commonResponse
+}

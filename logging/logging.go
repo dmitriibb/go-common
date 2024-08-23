@@ -1,6 +1,7 @@
 package logging
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -24,12 +25,7 @@ func LogInfo(message string) {
 	loggerInfo.Println(message)
 }
 func logMessage(loggerName string, prefix logLevel, messageArgs ...any) {
-	var message string
-	if len(messageArgs) > 1 {
-		message = fmt.Sprintf(messageArgs[0].(string), messageArgs[1:]...)
-	} else {
-		message = messageArgs[0].(string)
-	}
+	message := argsToMessage(messageArgs...)
 	switch prefix {
 	case DEBUG:
 		loggerDebug.Println(fmt.Sprintf("%v - %v", loggerName, message))
@@ -42,6 +38,14 @@ func logMessage(loggerName string, prefix logLevel, messageArgs ...any) {
 	}
 }
 
+func argsToMessage(messageArgs ...any) string {
+	if len(messageArgs) > 1 {
+		return fmt.Sprintf(messageArgs[0].(string), messageArgs[1:]...)
+	} else {
+		return messageArgs[0].(string)
+	}
+}
+
 type customLogger struct {
 	loggerName string
 }
@@ -51,6 +55,7 @@ type Logger interface {
 	Info(messageArgs ...any)
 	Warn(messageArgs ...any)
 	Error(messageArgs ...any)
+	NewError(messageArgs ...any) error
 }
 
 func NewLogger(loggerName string) Logger {
@@ -68,4 +73,9 @@ func (logger *customLogger) Warn(messageArgs ...any) {
 }
 func (logger *customLogger) Error(messageArgs ...any) {
 	logMessage(logger.loggerName, ERROR, messageArgs...)
+}
+func (logger *customLogger) NewError(messageArgs ...any) error {
+	msg := argsToMessage(messageArgs...)
+	logMessage(logger.loggerName, ERROR, msg)
+	return errors.New(msg)
 }
