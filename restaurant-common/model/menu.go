@@ -1,7 +1,7 @@
 package model
 
 type MenuDto struct {
-	Items []*MenuItemDto
+	Items []*MenuItemDto `json:"items"`
 }
 
 type MenuItemDto struct {
